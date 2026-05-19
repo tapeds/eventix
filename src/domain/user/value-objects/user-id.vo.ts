@@ -1,5 +1,5 @@
 import { ValueObject } from '../../../common/domain/value-object';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 interface UserIdProps {
   value: string;
@@ -18,7 +18,7 @@ export class UserId extends ValueObject<UserIdProps> {
   }
 
   static generate(): UserId {
-    const id = uuidv4();
+    const id = randomUUID();
     return new UserId(id);
   }
 

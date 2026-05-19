@@ -66,7 +66,10 @@ describe('User Aggregate', () => {
     });
 
     it('should normalize the email to lowercase', () => {
-      const user = User.register({ ...BASE_PROPS, email: 'John.Doe@EXAMPLE.COM' });
+      const user = User.register({
+        ...BASE_PROPS,
+        email: 'John.Doe@EXAMPLE.COM',
+      });
       expect(user.email.value).toBe('john.doe@example.com');
     });
   });
