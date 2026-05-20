@@ -33,15 +33,6 @@ export interface CreateBookingProps {
 
 const DEFAULT_PAYMENT_WINDOW_MINUTES = 15;
 
-/**
- * Booking aggregate root: a customer's reservation for a number of tickets in one
- * ticket category, held until payment.
- *
- * NOTE: cross-aggregate rules (event must be Published, ticket category active and
- * within its sales period, quantity within remaining quota, only one active booking
- * per customer/event) depend on the Event aggregate and are enforced by the
- * application layer (Week 11). This aggregate enforces only its intrinsic rules.
- */
 export class Booking extends AggregateRoot<BookingId> {
   private _customerId: string;
   private _eventId: string;
@@ -199,10 +190,6 @@ export class Booking extends AggregateRoot<BookingId> {
     return this.issuedTickets;
   }
 
-  /**
-   * US11 (Expire Booking). A PendingPayment booking past its deadline becomes
-   * Expired, releasing reserved quota; a Paid booking can never expire.
-   */
   expire(now: Date = new Date()): void {
     if (this._status.isPaid()) {
       throw new Error('A paid booking cannot be expired');
