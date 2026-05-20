@@ -1,13 +1,14 @@
 import { IDomainEvent } from '../../../common/domain/domain-event.interface';
 
-export class BookingExpiredEvent implements IDomainEvent {
+export class TicketCheckedInEvent implements IDomainEvent {
   readonly occurredOn: Date;
-  readonly eventName = 'BookingExpired';
+  readonly eventName = 'TicketCheckedIn';
 
   constructor(
-    readonly bookingId: string,
+    readonly ticketId: string,
+    readonly ticketCode: string,
     readonly eventId: string,
-    readonly quantity: number,
+    readonly checkedInAt: Date,
   ) {
     this.occurredOn = new Date();
   }
