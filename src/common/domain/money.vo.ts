@@ -27,6 +27,19 @@ export class Money {
     return new Money(this._amount * factor, this._currency);
   }
 
+  public equals(other: Money): boolean {
+    if (other === null || other === undefined) return false;
+    return this._currency === other._currency && this._amount === other._amount;
+  }
+
+  public isZero(): boolean {
+    return this._amount === 0;
+  }
+
+  static zero(currency = 'IDR'): Money {
+    return new Money(0, currency);
+  }
+
   private assertSameCurrency(other: Money) {
     if (this._currency !== other._currency)
       throw new Error('Currency mismatch');

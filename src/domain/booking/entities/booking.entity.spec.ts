@@ -1,5 +1,5 @@
 import { Booking, CreateBookingProps } from './booking.entity';
-import { Money } from '../value-objects/money.vo';
+import { Money } from '../../../common/domain/money.vo';
 import { BookingStatusEnum } from '../value-objects/booking-status.vo';
 import { TicketStatusEnum } from '../value-objects/ticket-status.vo';
 import { TicketReservedEvent } from '../events/ticket-reserved.event';

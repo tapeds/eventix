@@ -1,7 +1,7 @@
 import { AggregateRoot } from '../../../common/domain/aggregate-root';
 import { BookingId } from '../value-objects/booking-id.vo';
 import { BookingStatus } from '../value-objects/booking-status.vo';
-import { Money } from '../value-objects/money.vo';
+import { Money } from '../../../common/domain/money.vo';
 import { Ticket } from './ticket.entity';
 import { TicketReservedEvent } from '../events/ticket-reserved.event';
 import { BookingPaidEvent } from '../events/booking-paid.event';
