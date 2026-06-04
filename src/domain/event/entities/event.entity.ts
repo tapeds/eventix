@@ -55,6 +55,14 @@ export class Event extends AggregateRoot<string> {
     return this._name;
   }
 
+  get description(): string | undefined {
+    return this._description;
+  }
+
+  get location(): string | undefined {
+    return this._location;
+  }
+
   get startDate(): Date {
     return this._startDate;
   }
