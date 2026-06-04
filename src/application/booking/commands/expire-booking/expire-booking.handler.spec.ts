@@ -65,6 +65,7 @@ const makeRepo = (
   findById: jest.fn().mockResolvedValue(findResult),
   save: jest.fn().mockResolvedValue(undefined),
   findActiveByCustomerAndEvent: jest.fn(),
+  findByEventId: jest.fn(),
   delete: jest.fn(),
 });
 

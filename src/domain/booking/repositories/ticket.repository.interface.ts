@@ -15,4 +15,7 @@ export interface ITicketRepository {
   findByBookingId(bookingId: BookingId): Promise<Ticket[]>;
 
   findByCustomerId(customerId: string): Promise<Ticket[]>;
+
+  /** All tickets issued for an event; backs the sales report (US19) and participant list (US20). */
+  findByEventId(eventId: string): Promise<Ticket[]>;
 }

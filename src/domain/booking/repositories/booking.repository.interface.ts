@@ -11,5 +11,7 @@ export interface IBookingRepository {
     eventId: string,
   ): Promise<Booking | null>;
 
+  findByEventId(eventId: string): Promise<Booking[]>;
+
   delete(id: BookingId): Promise<void>;
 }

@@ -119,6 +119,7 @@ const makeBookingRepo = (
   findById: jest.fn().mockResolvedValue(booking),
   save: jest.fn().mockResolvedValue(undefined),
   findActiveByCustomerAndEvent: jest.fn(),
+  findByEventId: jest.fn(),
   delete: jest.fn(),
 });
 
@@ -129,6 +130,7 @@ const makeTicketRepo = (tickets: Ticket[]): jest.Mocked<ITicketRepository> => ({
   findByCode: jest.fn(),
   findByBookingId: jest.fn().mockResolvedValue(tickets),
   findByCustomerId: jest.fn(),
+  findByEventId: jest.fn(),
 });
 
 const makeEventRepo = (event: Event | null): jest.Mocked<EventRepository> => ({
