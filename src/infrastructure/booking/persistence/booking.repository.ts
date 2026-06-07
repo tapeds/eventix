@@ -38,6 +38,11 @@ export class BookingRepository implements IBookingRepository {
     return orm ? BookingMapper.toDomain(orm) : null;
   }
 
+  async findByEventId(eventId: string): Promise<Booking[]> {
+    const rows = await this.repo.find({ where: { eventId } });
+    return rows.map((r) => BookingMapper.toDomain(r));
+  }
+
   async delete(id: BookingId): Promise<void> {
     await this.repo.delete({ id: id.value });
   }

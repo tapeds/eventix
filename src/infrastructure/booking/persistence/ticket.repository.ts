@@ -51,4 +51,9 @@ export class TicketRepository implements ITicketRepository {
       .getMany();
     return rows.map((r) => TicketMapper.toDomain(r));
   }
+
+  async findByEventId(eventId: string): Promise<Ticket[]> {
+    const rows = await this.repo.find({ where: { eventId } });
+    return rows.map((r) => TicketMapper.toDomain(r));
+  }
 }
