@@ -3,3 +3,5 @@ export const TICKET_REPOSITORY = Symbol('ITicketRepository');
 export const TICKET_READ_MODEL = Symbol('ITicketReadModel');
 export const EVENT_REPOSITORY = Symbol('EventRepository');
 export const USER_REPOSITORY = Symbol('IUserRepository');
+export const DOMAIN_EVENT_PUBLISHER = Symbol('IDomainEventPublisher');
+export const PASSWORD_HASHER = Symbol('IPasswordHasher');
