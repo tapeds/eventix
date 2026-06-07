@@ -1,4 +1,3 @@
-/** Read-model for a user profile returned by the User query handlers. */
 export interface UserProfileDto {
   id: string;
   name: string;

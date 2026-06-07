@@ -9,11 +9,14 @@ import { TicketReadModelTypeorm } from '../booking/read-models/ticket.read-model
 import { EventOrmEntity } from '../event/persistence/event.orm-entity';
 import { EventRepository } from '../event/persistence/event.repository';
 import { TicketCategoryOrmEntity } from '../event/persistence/ticket-category.orm-entity';
+import { UserOrmEntity } from '../user/persistence/user.orm-entity';
+import { UserRepository } from '../user/persistence/user.repository';
 import {
   BOOKING_REPOSITORY,
   EVENT_REPOSITORY,
   TICKET_READ_MODEL,
   TICKET_REPOSITORY,
+  USER_REPOSITORY,
 } from './tokens';
 
 @Module({
@@ -33,6 +36,7 @@ import {
           TicketOrmEntity,
           EventOrmEntity,
           TicketCategoryOrmEntity,
+          UserOrmEntity,
         ],
         synchronize: false,
       }),
@@ -42,6 +46,7 @@ import {
       TicketOrmEntity,
       EventOrmEntity,
       TicketCategoryOrmEntity,
+      UserOrmEntity,
     ]),
   ],
   providers: [
@@ -49,12 +54,14 @@ import {
     { provide: TICKET_REPOSITORY, useClass: TicketRepository },
     { provide: TICKET_READ_MODEL, useClass: TicketReadModelTypeorm },
     { provide: EVENT_REPOSITORY, useClass: EventRepository },
+    { provide: USER_REPOSITORY, useClass: UserRepository },
   ],
   exports: [
     BOOKING_REPOSITORY,
     TICKET_REPOSITORY,
     TICKET_READ_MODEL,
     EVENT_REPOSITORY,
+    USER_REPOSITORY,
     TypeOrmModule,
   ],
 })
