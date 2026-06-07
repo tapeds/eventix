@@ -59,7 +59,6 @@ export class GetEventDetailsHandler implements IUseCase<
     category: TicketCategory,
     now: Date,
   ): TicketCategoryPurchaseStatus {
-    // Disabled categories are not offered for purchase; surface them as closed.
     if (!category.status.isActive()) {
       return 'SalesClosed';
     }

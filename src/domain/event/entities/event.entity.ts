@@ -51,11 +51,6 @@ export class Event extends AggregateRoot<string> {
     return event;
   }
 
-  /**
-   * Rebuilds a persisted event from storage. Unlike `create`, it skips invariant
-   * checks and raises no domain events, and restores the persisted status and
-   * ticket categories verbatim.
-   */
   public static reconstitute(
     props: EventProps,
     status: EventStatus,

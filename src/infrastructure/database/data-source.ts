@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { BookingOrmEntity } from '../booking/persistence/booking.orm-entity';
 import { TicketOrmEntity } from '../booking/persistence/ticket.orm-entity';
+import { EventOrmEntity } from '../event/persistence/event.orm-entity';
+import { TicketCategoryOrmEntity } from '../event/persistence/ticket-category.orm-entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -10,7 +12,12 @@ export const AppDataSource = new DataSource({
   username: process.env.DATABASE_USER ?? 'eventix',
   password: process.env.DATABASE_PASSWORD ?? 'eventix',
   database: process.env.DATABASE_NAME ?? 'eventix',
-  entities: [BookingOrmEntity, TicketOrmEntity],
+  entities: [
+    BookingOrmEntity,
+    TicketOrmEntity,
+    EventOrmEntity,
+    TicketCategoryOrmEntity,
+  ],
   migrations: ['src/infrastructure/database/migrations/*.ts'],
   synchronize: false,
   logging: ['error', 'warn'],

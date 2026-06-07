@@ -33,7 +33,6 @@ export class GetSalesReportHandler implements IUseCase<
 
     const soldByCategory = new Map<string, number>();
     for (const ticket of tickets) {
-      // Cancelled tickets (e.g. refunded) are not counted as sold.
       if (ticket.status.isCancelled() || ticket.status.isRefundRequired()) {
         continue;
       }
