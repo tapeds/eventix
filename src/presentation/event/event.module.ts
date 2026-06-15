@@ -47,9 +47,19 @@ import { TicketCategoryController } from './ticket-category.controller';
     },
     {
       provide: CancelEventHandler,
-      useFactory: (repo: EventRepository, publisher: IDomainEventPublisher) =>
-        new CancelEventHandler(repo, publisher),
-      inject: [EVENT_REPOSITORY, DOMAIN_EVENT_PUBLISHER],
+      useFactory: (
+        eventRepo: EventRepository,
+        bookingRepo: IBookingRepository,
+        ticketRepo: ITicketRepository,
+        publisher: IDomainEventPublisher,
+      ) =>
+        new CancelEventHandler(eventRepo, bookingRepo, ticketRepo, publisher),
+      inject: [
+        EVENT_REPOSITORY,
+        BOOKING_REPOSITORY,
+        TICKET_REPOSITORY,
+        DOMAIN_EVENT_PUBLISHER,
+      ],
     },
     {
       provide: CreateTicketCategoryHandler,
