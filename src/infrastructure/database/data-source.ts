@@ -5,6 +5,7 @@ import { TicketOrmEntity } from '../booking/persistence/ticket.orm-entity';
 import { EventOrmEntity } from '../event/persistence/event.orm-entity';
 import { TicketCategoryOrmEntity } from '../event/persistence/ticket-category.orm-entity';
 import { UserOrmEntity } from '../user/persistence/user.orm-entity';
+import { RefundOrmEntity } from '../refund/persistence/refund.orm-entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -19,6 +20,7 @@ export const AppDataSource = new DataSource({
     EventOrmEntity,
     TicketCategoryOrmEntity,
     UserOrmEntity,
+    RefundOrmEntity,
   ],
   migrations: ['src/infrastructure/database/migrations/*.ts'],
   synchronize: false,
