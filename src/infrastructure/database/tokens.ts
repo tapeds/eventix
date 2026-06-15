@@ -5,3 +5,4 @@ export const EVENT_REPOSITORY = Symbol('EventRepository');
 export const USER_REPOSITORY = Symbol('IUserRepository');
 export const DOMAIN_EVENT_PUBLISHER = Symbol('IDomainEventPublisher');
 export const PASSWORD_HASHER = Symbol('IPasswordHasher');
+export const PAYMENT_GATEWAY = Symbol('IPaymentGateway');
