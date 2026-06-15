@@ -10,6 +10,8 @@ import { RequestRefundHandler } from '../../application/refund/commands/request-
 import { RequestRefundCommand } from '../../application/refund/commands/request-refund/request-refund.command';
 import { RejectRefundHandler } from '../../application/refund/commands/reject-refund/reject-refund.handler';
 import { RejectRefundCommand } from '../../application/refund/commands/reject-refund/reject-refund.command';
+import { ApproveRefundHandler } from '../../application/refund/commands/approve-refund/approve-refund.handler';
+import { ApproveRefundCommand } from '../../application/refund/commands/approve-refund/approve-refund.command';
 
 interface RequestRefundBody {
   bookingId?: string;
@@ -25,6 +27,7 @@ export class RefundController {
   constructor(
     private readonly requestRefund: RequestRefundHandler,
     private readonly rejectRefund: RejectRefundHandler,
+    private readonly approveRefund: ApproveRefundHandler,
   ) {}
 
   @Post()
@@ -51,5 +54,11 @@ export class RefundController {
       throw new BadRequestException('reason is required');
     }
     await this.rejectRefund.execute(new RejectRefundCommand(id, body.reason));
+  }
+
+  @Post(':id/approve')
+  @HttpCode(204)
+  async approve(@Param('id') id: string): Promise<void> {
+    await this.approveRefund.execute(new ApproveRefundCommand(id));
   }
 }

@@ -15,6 +15,7 @@ import { EventRepository } from '../../domain/event/repositories/event.repositor
 import { IRefundRepository } from '../../domain/refund/repositories/refund.repository.interface';
 import { RequestRefundHandler } from '../../application/refund/commands/request-refund/request-refund.handler';
 import { RejectRefundHandler } from '../../application/refund/commands/reject-refund/reject-refund.handler';
+import { ApproveRefundHandler } from '../../application/refund/commands/approve-refund/approve-refund.handler';
 import { RefundController } from './refund.controller';
 
 @Module({
@@ -56,6 +57,27 @@ import { RefundController } from './refund.controller';
         publisher: IDomainEventPublisher,
       ) => new RejectRefundHandler(refundRepo, publisher),
       inject: [REFUND_REPOSITORY, DOMAIN_EVENT_PUBLISHER],
+    },
+    {
+      provide: ApproveRefundHandler,
+      useFactory: (
+        refundRepo: IRefundRepository,
+        bookingRepo: IBookingRepository,
+        ticketRepo: ITicketRepository,
+        publisher: IDomainEventPublisher,
+      ) =>
+        new ApproveRefundHandler(
+          refundRepo,
+          bookingRepo,
+          ticketRepo,
+          publisher,
+        ),
+      inject: [
+        REFUND_REPOSITORY,
+        BOOKING_REPOSITORY,
+        TICKET_REPOSITORY,
+        DOMAIN_EVENT_PUBLISHER,
+      ],
     },
   ],
 })
