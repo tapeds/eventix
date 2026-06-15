@@ -1,6 +1,8 @@
 import { AppDataSource } from '../data-source';
 import { BookingOrmEntity } from '../../booking/persistence/booking.orm-entity';
 import { TicketOrmEntity } from '../../booking/persistence/ticket.orm-entity';
+import { EventOrmEntity } from '../../event/persistence/event.orm-entity';
+import { TicketCategoryOrmEntity } from '../../event/persistence/ticket-category.orm-entity';
 
 const EVENT_ID = '11111111-1111-1111-1111-111111111111';
 const CATEGORY_ID = '22222222-2222-2222-2222-222222222222';
@@ -14,6 +16,36 @@ const BOOKING_B1 = 'b1111111-1111-1111-1111-111111111111';
 const TICKET_A1_1 = 'a1a1a1a1-1111-1111-1111-111111111111';
 const TICKET_A1_2 = 'a1a1a1a1-2222-2222-2222-222222222222';
 const TICKET_B1_1 = 'b1b1b1b1-1111-1111-1111-111111111111';
+
+const DAY = 24 * 60 * 60 * 1000;
+const NOW = Date.now();
+
+function buildEvent(): EventOrmEntity {
+  const e = new EventOrmEntity();
+  e.id = EVENT_ID;
+  e.name = 'Eventix Demo Concert';
+  e.description = 'Seeded Published event for manual API testing';
+  e.startDate = new Date(NOW + 45 * DAY);
+  e.endDate = new Date(NOW + 45 * DAY + 3 * 60 * 60_000);
+  e.location = 'Jakarta';
+  e.maxCapacity = 100;
+  e.status = 'Published';
+  return e;
+}
+
+function buildCategory(): TicketCategoryOrmEntity {
+  const c = new TicketCategoryOrmEntity();
+  c.id = CATEGORY_ID;
+  c.eventId = EVENT_ID;
+  c.name = 'Regular';
+  c.priceAmount = '50000.00';
+  c.priceCurrency = 'IDR';
+  c.quota = 20;
+  c.salesStartDate = new Date(NOW - 30 * DAY);
+  c.salesEndDate = new Date(NOW + 40 * DAY);
+  c.status = 'Active';
+  return c;
+}
 
 function buildBooking(overrides: Partial<BookingOrmEntity>): BookingOrmEntity {
   const b = new BookingOrmEntity();
@@ -53,8 +85,12 @@ async function seed(): Promise<void> {
 
   try {
     await AppDataSource.transaction(async (mgr) => {
-      await mgr.createQueryBuilder().delete().from(TicketOrmEntity).execute();
-      await mgr.createQueryBuilder().delete().from(BookingOrmEntity).execute();
+      await mgr.query(
+        'TRUNCATE TABLE refunds, tickets, bookings, ticket_categories, events CASCADE',
+      );
+
+      await mgr.save(EventOrmEntity, buildEvent());
+      await mgr.save(TicketCategoryOrmEntity, buildCategory());
 
       await mgr.save(BookingOrmEntity, [
         buildBooking({
@@ -105,9 +141,21 @@ async function seed(): Promise<void> {
 
     console.log('Seeded:');
     console.log(
+      `  event ${EVENT_ID} → Published, capacity 100, starts in 45 days`,
+    );
+    console.log(
+      `  category ${CATEGORY_ID} → Regular @ 50_000 IDR, quota 20, sales open`,
+    );
+    console.log(
       `  customer A (${CUSTOMER_A}) → 2 paid tickets, 1 pending booking`,
     );
     console.log(`  customer B (${CUSTOMER_B}) → 1 checked-in ticket`);
+    console.log('');
+    console.log('Try US8 manually:');
+    console.log('  POST /api/bookings');
+    console.log(
+      `  { "customerId": "<any-uuid>", "eventId": "${EVENT_ID}", "ticketCategoryId": "${CATEGORY_ID}", "quantity": 1 }`,
+    );
   } finally {
     await AppDataSource.destroy();
   }

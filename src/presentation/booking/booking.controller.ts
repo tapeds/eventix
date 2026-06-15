@@ -6,10 +6,22 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { CreateBookingHandler } from '../../application/booking/commands/create-booking/create-booking.handler';
+import {
+  CreateBookingCommand,
+  CreateBookingResult,
+} from '../../application/booking/commands/create-booking/create-booking.command';
 import { ExpireBookingHandler } from '../../application/booking/commands/expire-booking/expire-booking.handler';
 import { ExpireBookingCommand } from '../../application/booking/commands/expire-booking/expire-booking.command';
 import { PayBookingHandler } from '../../application/booking/commands/pay-booking/pay-booking.handler';
 import { PayBookingCommand } from '../../application/booking/commands/pay-booking/pay-booking.command';
+
+interface CreateBookingBody {
+  customerId?: string;
+  eventId?: string;
+  ticketCategoryId?: string;
+  quantity?: number;
+}
 
 interface PayBookingBody {
   customerId?: string;
@@ -20,9 +32,34 @@ interface PayBookingBody {
 @Controller('bookings')
 export class BookingController {
   constructor(
+    private readonly createBooking: CreateBookingHandler,
     private readonly payBooking: PayBookingHandler,
     private readonly expireBooking: ExpireBookingHandler,
   ) {}
+
+  @Post()
+  async create(@Body() body: CreateBookingBody): Promise<CreateBookingResult> {
+    if (!body.customerId) {
+      throw new BadRequestException('customerId is required');
+    }
+    if (!body.eventId) {
+      throw new BadRequestException('eventId is required');
+    }
+    if (!body.ticketCategoryId) {
+      throw new BadRequestException('ticketCategoryId is required');
+    }
+    if (typeof body.quantity !== 'number') {
+      throw new BadRequestException('quantity must be a number');
+    }
+    return this.createBooking.execute(
+      new CreateBookingCommand(
+        body.customerId,
+        body.eventId,
+        body.ticketCategoryId,
+        body.quantity,
+      ),
+    );
+  }
 
   @Post(':id/pay')
   @HttpCode(204)
