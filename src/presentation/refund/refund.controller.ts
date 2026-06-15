@@ -12,6 +12,8 @@ import { RejectRefundHandler } from '../../application/refund/commands/reject-re
 import { RejectRefundCommand } from '../../application/refund/commands/reject-refund/reject-refund.command';
 import { ApproveRefundHandler } from '../../application/refund/commands/approve-refund/approve-refund.handler';
 import { ApproveRefundCommand } from '../../application/refund/commands/approve-refund/approve-refund.command';
+import { MarkRefundPaidOutHandler } from '../../application/refund/commands/mark-refund-paid-out/mark-refund-paid-out.handler';
+import { MarkRefundPaidOutCommand } from '../../application/refund/commands/mark-refund-paid-out/mark-refund-paid-out.command';
 
 interface RequestRefundBody {
   bookingId?: string;
@@ -28,6 +30,7 @@ export class RefundController {
     private readonly requestRefund: RequestRefundHandler,
     private readonly rejectRefund: RejectRefundHandler,
     private readonly approveRefund: ApproveRefundHandler,
+    private readonly markRefundPaidOut: MarkRefundPaidOutHandler,
   ) {}
 
   @Post()
@@ -60,5 +63,11 @@ export class RefundController {
   @HttpCode(204)
   async approve(@Param('id') id: string): Promise<void> {
     await this.approveRefund.execute(new ApproveRefundCommand(id));
+  }
+
+  @Post(':id/pay-out')
+  @HttpCode(204)
+  async payOut(@Param('id') id: string): Promise<void> {
+    await this.markRefundPaidOut.execute(new MarkRefundPaidOutCommand(id));
   }
 }
