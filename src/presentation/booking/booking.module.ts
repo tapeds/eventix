@@ -19,6 +19,7 @@ import { EventRepository } from '../../domain/event/repositories/event.repositor
 import { CreateBookingHandler } from '../../application/booking/commands/create-booking/create-booking.handler';
 import { ExpireBookingHandler } from '../../application/booking/commands/expire-booking/expire-booking.handler';
 import { PayBookingHandler } from '../../application/booking/commands/pay-booking/pay-booking.handler';
+import { CheckInTicketHandler } from '../../application/booking/commands/check-in-ticket/check-in-ticket.handler';
 import { GetCustomerTicketsHandler } from '../../application/booking/queries/get-customer-tickets/get-customer-tickets.handler';
 import { BookingController } from './booking.controller';
 import { TicketController } from './ticket.controller';
@@ -78,6 +79,15 @@ import { TicketController } from './ticket.controller';
       useFactory: (readModel: ITicketReadModel) =>
         new GetCustomerTicketsHandler(readModel),
       inject: [TICKET_READ_MODEL],
+    },
+    {
+      provide: CheckInTicketHandler,
+      useFactory: (
+        ticketRepo: ITicketRepository,
+        eventRepo: EventRepository,
+        publisher: IDomainEventPublisher,
+      ) => new CheckInTicketHandler(ticketRepo, eventRepo, publisher),
+      inject: [TICKET_REPOSITORY, EVENT_REPOSITORY, DOMAIN_EVENT_PUBLISHER],
     },
   ],
 })
