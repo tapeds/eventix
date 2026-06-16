@@ -6,6 +6,8 @@ import { TicketCategoryOrmEntity } from '../../../../infrastructure/event/persis
 import { EventRepository } from '../../../../infrastructure/event/persistence/event.repository';
 import { CreateBookingHandler } from './create-booking.handler';
 import { CreateBookingCommand } from './create-booking.command';
+import { ExpireBookingHandler } from '../expire-booking/expire-booking.handler';
+import { ExpireBookingCommand } from '../expire-booking/expire-booking.command';
 import { Booking } from '../../../../domain/booking/entities/booking.entity';
 import {
   BookingStatus,
@@ -81,6 +83,25 @@ const buildPaidBookingFor = (
     createdAt: new Date(Date.now() - DAY),
     paymentDeadline: new Date(Date.now() - DAY + 15 * 60_000),
     paidAt: new Date(Date.now() - DAY + 5 * 60_000),
+  });
+
+const buildPendingPastDeadlineBookingFor = (
+  customerId: string,
+  bookingId: string,
+  quantity: number,
+): Booking =>
+  Booking.reconstitute(bookingId, {
+    customerId,
+    eventId: EVENT_ID,
+    ticketCategoryId: CATEGORY_ID,
+    quantity,
+    unitPrice: new Money(50_000),
+    serviceFee: Money.zero(),
+    totalPrice: new Money(50_000 * quantity),
+    status: BookingStatus.pendingPayment(),
+    createdAt: new Date(Date.now() - DAY),
+    paymentDeadline: new Date(Date.now() - 60_000),
+    paidAt: null,
   });
 
 describe('CreateBookingHandler (integration)', () => {
@@ -168,5 +189,42 @@ describe('CreateBookingHandler (integration)', () => {
     ).rejects.toBeInstanceOf(InsufficientQuotaError);
 
     expect(publisher.events).toHaveLength(0);
+  });
+
+  it('releases reserved seats when a previous booking expires (US11)', async () => {
+    await eventRepo.save(buildPublishedEvent(1));
+    const occupyingBookingId = 'b1111111-1111-1111-1111-111111111111';
+    const occupyingCustomerId = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+    await bookingRepo.save(
+      buildPendingPastDeadlineBookingFor(
+        occupyingCustomerId,
+        occupyingBookingId,
+        1,
+      ),
+    );
+
+    // Quota is already fully reserved by the pending booking
+    await expect(
+      handler.execute(
+        new CreateBookingCommand(CUSTOMER_ID, EVENT_ID, CATEGORY_ID, 1),
+      ),
+    ).rejects.toBeInstanceOf(InsufficientQuotaError);
+
+    // Expire the occupying booking — its seat should be released
+    const expireHandler = new ExpireBookingHandler(bookingRepo, publisher);
+    await expireHandler.execute(new ExpireBookingCommand(occupyingBookingId));
+
+    const expired = await bookingRepo.findById(
+      new BookingId(occupyingBookingId),
+    );
+    expect(expired!.status.value).toBe(BookingStatusEnum.EXPIRED);
+
+    // Same request now succeeds because the expired booking no longer counts
+    const result = await handler.execute(
+      new CreateBookingCommand(CUSTOMER_ID, EVENT_ID, CATEGORY_ID, 1),
+    );
+    const stored = await bookingRepo.findById(new BookingId(result.bookingId));
+    expect(stored!.status.value).toBe(BookingStatusEnum.PENDING_PAYMENT);
+    expect(stored!.customerId).toBe(CUSTOMER_ID);
   });
 });
