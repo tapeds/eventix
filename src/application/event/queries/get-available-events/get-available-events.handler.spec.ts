@@ -5,8 +5,7 @@ import { Event } from '../../../../domain/event/entities/event.entity';
 import { TicketCategory } from '../../../../domain/event/entities/ticket-category.entity';
 import { Money } from '../../../../common/domain/money.vo';
 
-const NOW = Date.now();
-const SALES_START = new Date(NOW - 1000 * 60 * 60);
+const ONE_HOUR = 1000 * 60 * 60;
 
 const buildEvent = (
   id: string,
@@ -27,8 +26,8 @@ const buildEvent = (
         name: `Cat ${i}`,
         price: new Money(price),
         quota: 10,
-        salesStartDate: SALES_START,
-        salesEndDate: opts.start,
+        salesStartDate: new Date(opts.start.getTime() - 2 * ONE_HOUR),
+        salesEndDate: new Date(opts.start.getTime() - ONE_HOUR),
       }),
     ),
   );
