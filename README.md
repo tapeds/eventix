@@ -379,3 +379,9 @@ All routes are prefixed with `/api`.
 | `pnpm seed` | Seed sample data |
 | `pnpm docs:generate` | Generate `openapi.json` from the code |
 | `pnpm lint` / `format` | Lint and format |
+
+## Unit test results
+
+All test passed.
+
+![Unit Test](./images/UnitTest.png)
