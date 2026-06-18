@@ -33,7 +33,7 @@ Root: `Event`, with `TicketCategory` as a child entity inside the aggregate boun
 - Cancelling is rejected for already-cancelled or **Completed** events → becomes **Cancelled**.
 - A ticket category can be disabled (soft-disable, kept for history); customers cannot buy from an inactive category.
 
-### Booking (`src/domain/booking` — `Booking`)
+### Booking (`src/domain/booking` - `Booking`)
 Represents one customer's reservation for a quantity of tickets in a single category.
 
 - Quantity must be a positive integer.
@@ -43,14 +43,14 @@ Represents one customer's reservation for a quantity of tickets in a single cate
 - **Expire**: a Paid booking can never expire; only a PendingPayment booking past its deadline can → becomes **Expired**, releasing quota. *(US11)*
 - **Refund**: only a Paid booking can be marked **Refunded**.
 
-### Ticket (`src/domain/booking` — `Ticket`)
+### Ticket (`src/domain/booking` - `Ticket`)
 A single admission issued when a booking is paid; carries a unique `TicketCode`.
 
 - Issued as **Active**.
 - **Check-in**: the ticket must belong to the event being checked into, must not already be checked in, and must be Active → becomes **CheckedIn**. Invalid attempts throw and never change state. *(US13/US14)*
 - A checked-in ticket cannot be cancelled; a cancelled ticket cannot be flipped to **RefundRequired** (used when an event is cancelled).
 
-### Refund (`src/domain/refund` — `Refund`)
+### Refund (`src/domain/refund` - `Refund`)
 The lifecycle of a single refund request for a paid booking.
 
 - Created in status **Requested**. *(US15)*
@@ -58,11 +58,96 @@ The lifecycle of a single refund request for a paid booking.
 - **Mark paid out**: only from Approved and requires a payment reference → **PaidOut** (terminal). *(US18)*
 - Cross-aggregate preconditions (booking is Paid, no ticket checked in, before the refund deadline, auto-allowed when the event is cancelled) and side effects (tickets → Cancelled, booking → Refunded on approval) are enforced/orchestrated in the application layer.
 
-### User (`src/domain/user` — `User`)
+### User (`src/domain/user` - `User`)
 Identity and authorization for the human actors.
 
 - Registered with a name, a valid `Email` value object, and a `UserRole` (Event Organizer, Customer, Gate Officer, or System Admin).
 - A user's role can be changed, raising `UserRoleChanged`.
+
+### Domain model diagram
+
+Solid diamonds (`*--`) are composition within an aggregate boundary; dashed arrows (`..>`) are references to *other* aggregates, which are held **by id** (not object references) per DDD guidance.
+
+```mermaid
+classDiagram
+    class Event {
+        <<AggregateRoot>>
+        +EventId id
+        +String name
+        +Date startDate
+        +Date endDate
+        +int maxCapacity
+        +EventStatus status
+        +create()
+        +publish()
+        +cancel()
+        +addTicketCategory()
+        +disableTicketCategory()
+    }
+    class TicketCategory {
+        <<Entity>>
+        +String id
+        +Money price
+        +int quota
+        +Date salesStartDate
+        +Date salesEndDate
+        +TicketCategoryStatus status
+    }
+    class Booking {
+        <<AggregateRoot>>
+        +BookingId id
+        +String customerId
+        +String eventId
+        +String ticketCategoryId
+        +int quantity
+        +Money totalPrice
+        +BookingStatus status
+        +Date paymentDeadline
+        +pay()
+        +expire()
+        +markAsRefunded()
+    }
+    class Ticket {
+        <<AggregateRoot>>
+        +TicketId id
+        +TicketCode ticketCode
+        +String bookingId
+        +String eventId
+        +TicketStatus status
+        +checkIn()
+        +cancel()
+        +markRefundRequired()
+    }
+    class Refund {
+        <<AggregateRoot>>
+        +RefundId id
+        +String bookingId
+        +Money amount
+        +RefundStatus status
+        +approve()
+        +reject()
+        +markAsPaidOut()
+    }
+    class User {
+        <<AggregateRoot>>
+        +UserId id
+        +UserName name
+        +Email email
+        +UserRole role
+        +register()
+        +changeRole()
+    }
+
+    Event "1" *-- "1..*" TicketCategory : contains
+    Booking ..> Event : for (by id)
+    Booking ..> TicketCategory : for (by id)
+    Booking ..> Ticket : issues on pay
+    Ticket ..> Event : for (by id)
+    Refund ..> Booking : refunds (by id)
+    User ..> Booking : places
+```
+
+Value objects used across the model include `Money` (amount + currency, non-negative), the typed identifiers (`EventId`, `BookingId`, `TicketId`, `RefundId`, `UserId`), the status objects (`EventStatus`, `TicketCategoryStatus`, `BookingStatus`, `TicketStatus`, `RefundStatus`), `TicketCode`, `Email`, `UserName`, and `UserRole`.
 
 ## Prerequisites
 
