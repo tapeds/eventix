@@ -19,6 +19,51 @@ Shared building blocks (`AggregateRoot`, `BaseEntity`, `ValueObject`, `Money`, d
 
 Bounded contexts: **User**, **Event**, **Booking** (including Tickets), and **Refund**.
 
+## Aggregates and business rules
+
+The domain is modeled as five aggregate roots. Each one owns its invariants and only mutates its own state through intention-revealing methods; rules that span aggregates are orchestrated by application handlers (and, where relevant, by subscribing to domain events).
+
+### Event (`src/domain/event`)
+Root: `Event`, with `TicketCategory` as a child entity inside the aggregate boundary (categories are created and disabled through the `Event`).
+
+- An event cannot be created when the end date is before the start date, or when max capacity is not a positive integer.
+- A new event starts as **Draft**.
+- Adding a ticket category requires its sales period to end on or before the event start date, and the combined quota of all categories must never exceed the event's max capacity.
+- Publishing is only allowed from **Draft**, requires at least one **active** ticket category, and re-checks that total quota ≤ capacity → becomes **Published**.
+- Cancelling is rejected for already-cancelled or **Completed** events → becomes **Cancelled**.
+- A ticket category can be disabled (soft-disable, kept for history); customers cannot buy from an inactive category.
+
+### Booking (`src/domain/booking` — `Booking`)
+Represents one customer's reservation for a quantity of tickets in a single category.
+
+- Quantity must be a positive integer.
+- Total price = `unitPrice × quantity + serviceFee`, represented with the `Money` value object (which forbids negative amounts). *(US9)*
+- A new booking is **PendingPayment** with a payment deadline (default 15 minutes).
+- **Pay**: only from PendingPayment, only before the deadline, and only when the paid amount equals the total price → becomes **Paid** and issues one `Ticket` per quantity. *(US10)*
+- **Expire**: a Paid booking can never expire; only a PendingPayment booking past its deadline can → becomes **Expired**, releasing quota. *(US11)*
+- **Refund**: only a Paid booking can be marked **Refunded**.
+
+### Ticket (`src/domain/booking` — `Ticket`)
+A single admission issued when a booking is paid; carries a unique `TicketCode`.
+
+- Issued as **Active**.
+- **Check-in**: the ticket must belong to the event being checked into, must not already be checked in, and must be Active → becomes **CheckedIn**. Invalid attempts throw and never change state. *(US13/US14)*
+- A checked-in ticket cannot be cancelled; a cancelled ticket cannot be flipped to **RefundRequired** (used when an event is cancelled).
+
+### Refund (`src/domain/refund` — `Refund`)
+The lifecycle of a single refund request for a paid booking.
+
+- Created in status **Requested**. *(US15)*
+- **Approve**/**Reject**: only allowed from Requested; rejection requires a non-empty reason → **Approved** / **Rejected**. *(US16/US17)*
+- **Mark paid out**: only from Approved and requires a payment reference → **PaidOut** (terminal). *(US18)*
+- Cross-aggregate preconditions (booking is Paid, no ticket checked in, before the refund deadline, auto-allowed when the event is cancelled) and side effects (tickets → Cancelled, booking → Refunded on approval) are enforced/orchestrated in the application layer.
+
+### User (`src/domain/user` — `User`)
+Identity and authorization for the human actors.
+
+- Registered with a name, a valid `Email` value object, and a `UserRole` (Event Organizer, Customer, Gate Officer, or System Admin).
+- A user's role can be changed, raising `UserRoleChanged`.
+
 ## Prerequisites
 
 - Node.js 20+
