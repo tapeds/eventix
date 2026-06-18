@@ -19,6 +19,12 @@ Shared building blocks (`AggregateRoot`, `BaseEntity`, `ValueObject`, `Money`, d
 
 Bounded contexts: **User**, **Event**, **Booking** (including Tickets), and **Refund**.
 
+### Clean Architecture diagram
+
+Dependencies point inward - outer layers depend on inner layers, never the reverse. The application layer declares interfaces (repositories and external-system services) that the infrastructure layer implements (Dependency Inversion).
+
+![Clean Architecture Diagram](./images/CleanArchitecture.jpg)
+
 ## Aggregates and business rules
 
 The domain is modeled as five aggregate roots. Each one owns its invariants and only mutates its own state through intention-revealing methods; rules that span aggregates are orchestrated by application handlers (and, where relevant, by subscribing to domain events).
