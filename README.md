@@ -161,43 +161,76 @@ Interfaces for external systems are declared in the application layer and implem
 | `IPasswordHasher` | `src/application/user/services/password-hasher.interface.ts` | `src/infrastructure/user/services/bcrypt-password-hasher.ts` | Hash and verify user passwords. |
 | `INotificationService` | `src/application/notification/services/notification.interface.ts` | `src/infrastructure/notification/services/notification.service.ts` | Send email/WhatsApp notifications. |
 
-## REST API endpoints
+## API documentation
+
+The API is documented with **OpenAPI 3**, generated directly from the controllers and DTOs using [`@nestjs/swagger`](https://docs.nestjs.com/openapi/introduction) - so the documentation always reflects the actual code. There are two ways to consume it: the interactive Swagger UI (served by the running app) and the `openapi.json` spec file (committed at the repository root).
+
+### View the interactive Swagger UI
+
+Swagger UI lets you browse every endpoint, see request/response schemas, and call the API straight from the browser ("Try it out").
+
+1. Start the app (see [Getting started](#4-run-the-project)):
+
+   ```bash
+   pnpm start:dev
+   ```
+
+2. Open [`http://localhost:3000/api/docs`](http://localhost:3000/api/docs) in your browser.
+3. Expand an endpoint, click **Try it out**, fill in the parameters/body, and **Execute**. Requests are sent to the live API under the `/api` prefix.
+
+The raw spec served by the app is also available at `http://localhost:3000/api/docs-json`.
+
+### Use the `openapi.json` spec file
+
+[`openapi.json`](openapi.json) is a self-contained OpenAPI 3 document you can use without running the app. Regenerate it any time (no database required) with:
+
+```bash
+pnpm docs:generate
+```
+
+This builds the project and writes `openapi.json` from the live module graph. You can then:
+
+- **Import it into an API client** - in Bruno, Postman, or Insomnia choose *Import* and select `openapi.json` to get a ready-made collection of all endpoints.
+- **Generate client SDKs or a static docs site** - feed it to tools such as [`openapi-generator`](https://openapi-generator.tech/) or [Redoc](https://github.com/Redocly/redoc) (`npx @redocly/cli preview-docs openapi.json`).
+- **Preview it online** - paste its contents into the [Swagger Editor](https://editor.swagger.io/).
+
+### REST API endpoints
 
 All routes are prefixed with `/api`.
 
-### Users -`/users`
-- `POST /users` -register a user
-- `PATCH /users/:id/role` -change a user's role
-- `GET /users/by-email` -look up a user by email
-- `GET /users/:id` -get a user profile
+### Users - `/users`
+- `POST /users` - register a user
+- `PATCH /users/:id/role` - change a user's role
+- `GET /users/by-email` - look up a user by email
+- `GET /users/:id` - get a user profile
 
-### Events -`/events`
-- `POST /events` -create an event
-- `POST /events/:id/publish` -publish an event
-- `POST /events/:id/cancel` -cancel an event
-- `GET /events` -list available (published) events, filterable by date/location
-- `GET /events/:id` -event details
-- `GET /events/:id/participants` -participant list
-- `GET /events/:id/sales-report` -sales report
+### Events - `/events`
+- `POST /events` - create an event
+- `POST /events/:id/publish` - publish an event
+- `POST /events/:id/cancel` - cancel an event
+- `GET /events` - list available (published) events, filterable by date/location
+- `GET /events/:id` - event details
+- `GET /events/:id/participants` - participant list
+- `GET /events/:id/sales-report` - sales report
 
-### Ticket categories -`/events/:eventId/ticket-categories`
-- `POST /events/:eventId/ticket-categories` -create a ticket category
-- `POST /events/:eventId/ticket-categories/:categoryId/disable` -disable a ticket category
+### Ticket categories - `/events/:eventId/ticket-categories`
+- `POST /events/:eventId/ticket-categories` - create a ticket category
+- `POST /events/:eventId/ticket-categories/:categoryId/disable` - disable a ticket category
 
-### Bookings -`/bookings`
-- `POST /bookings` -create a booking
-- `POST /bookings/:id/pay` -pay a booking
-- `POST /bookings/:id/expire` -expire an unpaid booking
+### Bookings - `/bookings`
+- `POST /bookings` - create a booking
+- `POST /bookings/:id/pay` - pay a booking
+- `POST /bookings/:id/expire` - expire an unpaid booking
 
-### Tickets -`/tickets`
-- `GET /tickets` -list a customer's purchased tickets
-- `POST /tickets/check-in` -check in a ticket
+### Tickets - `/tickets`
+- `GET /tickets` - list a customer's purchased tickets
+- `POST /tickets/check-in` - check in a ticket
 
-### Refunds -`/refunds`
-- `POST /refunds` -request a refund
-- `POST /refunds/:id/approve` -approve a refund
-- `POST /refunds/:id/reject` -reject a refund
-- `POST /refunds/:id/pay-out` -mark a refund as paid out
+### Refunds - `/refunds`
+- `POST /refunds` - request a refund
+- `POST /refunds/:id/approve` - approve a refund
+- `POST /refunds/:id/reject` - reject a refund
+- `POST /refunds/:id/pay-out` - mark a refund as paid out
 
 ## Project scripts
 
@@ -208,4 +241,5 @@ All routes are prefixed with `/api`.
 | `pnpm test` / `test:cov` / `test:integration` | Run tests |
 | `pnpm migration:run` / `migration:revert` / `migration:generate` | Manage migrations |
 | `pnpm seed` | Seed sample data |
+| `pnpm docs:generate` | Generate `openapi.json` from the code |
 | `pnpm lint` / `format` | Lint and format |

@@ -9,6 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { RegisterUserHandler } from '../../application/user/commands/register-user/register-user.handler';
 import { RegisterUserCommand } from '../../application/user/commands/register-user/register-user.command';
 import { ChangeUserRoleHandler } from '../../application/user/commands/change-user-role/change-user-role.handler';
@@ -20,14 +21,14 @@ import { GetUserByEmailQuery } from '../../application/user/queries/get-user-by-
 import { UserProfileDto } from '../../application/user/dtos/user.dto';
 import { UserRoleEnum } from '../../domain/user/value-objects/user-role.vo';
 
-interface RegisterUserBody {
+export class RegisterUserBody {
   name?: string;
   email?: string;
   password?: string;
   role?: string;
 }
 
-interface ChangeUserRoleBody {
+export class ChangeUserRoleBody {
   role?: string;
 }
 
@@ -40,6 +41,7 @@ function parseRole(role: string | undefined): UserRoleEnum {
   return role as UserRoleEnum;
 }
 
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(

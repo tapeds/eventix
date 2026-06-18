@@ -8,6 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CreateEventHandler } from '../../application/event/commands/create-event/create-event.handler';
 import { CreateEventCommand } from '../../application/event/commands/create-event/create-event.command';
 import { PublishEventHandler } from '../../application/event/commands/publish-event/publish-event.handler';
@@ -29,7 +30,7 @@ import {
   SalesReportDto,
 } from '../../application/event/dtos/event.dto';
 
-interface CreateEventBody {
+export class CreateEventBody {
   name?: string;
   description?: string;
   startDate?: string;
@@ -38,10 +39,11 @@ interface CreateEventBody {
   maxCapacity?: number;
 }
 
-interface CancelEventBody {
+export class CancelEventBody {
   reason?: string;
 }
 
+@ApiTags('Events')
 @Controller('events')
 export class EventController {
   constructor(
@@ -90,6 +92,8 @@ export class EventController {
   }
 
   @Get()
+  @ApiQuery({ name: 'date', required: false })
+  @ApiQuery({ name: 'location', required: false })
   async list(
     @Query('date') date?: string,
     @Query('location') location?: string,

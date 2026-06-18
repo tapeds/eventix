@@ -6,6 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CreateBookingHandler } from '../../application/booking/commands/create-booking/create-booking.handler';
 import {
   CreateBookingCommand,
@@ -16,19 +17,20 @@ import { ExpireBookingCommand } from '../../application/booking/commands/expire-
 import { PayBookingHandler } from '../../application/booking/commands/pay-booking/pay-booking.handler';
 import { PayBookingCommand } from '../../application/booking/commands/pay-booking/pay-booking.command';
 
-interface CreateBookingBody {
+export class CreateBookingBody {
   customerId?: string;
   eventId?: string;
   ticketCategoryId?: string;
   quantity?: number;
 }
 
-interface PayBookingBody {
+export class PayBookingBody {
   customerId?: string;
   amount?: number;
   currency?: string;
 }
 
+@ApiTags('Bookings')
 @Controller('bookings')
 export class BookingController {
   constructor(

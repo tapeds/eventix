@@ -6,12 +6,13 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CreateTicketCategoryHandler } from '../../application/event/commands/create-ticket-category/create-ticket-category.handler';
 import { CreateTicketCategoryCommand } from '../../application/event/commands/create-ticket-category/create-ticket-category.command';
 import { DisableTicketCategoryHandler } from '../../application/event/commands/disable-ticket-category/disable-ticket-category.handler';
 import { DisableTicketCategoryCommand } from '../../application/event/commands/disable-ticket-category/disable-ticket-category.command';
 
-interface CreateTicketCategoryBody {
+export class CreateTicketCategoryBody {
   name?: string;
   price?: number;
   quota?: number;
@@ -20,6 +21,7 @@ interface CreateTicketCategoryBody {
   currency?: string;
 }
 
+@ApiTags('Ticket Categories')
 @Controller('events/:eventId/ticket-categories')
 export class TicketCategoryController {
   constructor(

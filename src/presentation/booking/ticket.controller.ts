@@ -6,6 +6,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { GetCustomerTicketsHandler } from '../../application/booking/queries/get-customer-tickets/get-customer-tickets.handler';
 import { GetCustomerTicketsQuery } from '../../application/booking/queries/get-customer-tickets/get-customer-tickets.query';
 import { CheckInTicketHandler } from '../../application/booking/commands/check-in-ticket/check-in-ticket.handler';
@@ -15,11 +16,12 @@ import {
 } from '../../application/booking/commands/check-in-ticket/check-in-ticket.command';
 import { TicketDto } from '../../application/booking/dtos/ticket.dto';
 
-interface CheckInTicketBody {
+export class CheckInTicketBody {
   ticketCode?: string;
   eventId?: string;
 }
 
+@ApiTags('Tickets')
 @Controller('tickets')
 export class TicketController {
   constructor(

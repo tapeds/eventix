@@ -6,6 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { RequestRefundHandler } from '../../application/refund/commands/request-refund/request-refund.handler';
 import { RequestRefundCommand } from '../../application/refund/commands/request-refund/request-refund.command';
 import { RejectRefundHandler } from '../../application/refund/commands/reject-refund/reject-refund.handler';
@@ -15,15 +16,16 @@ import { ApproveRefundCommand } from '../../application/refund/commands/approve-
 import { MarkRefundPaidOutHandler } from '../../application/refund/commands/mark-refund-paid-out/mark-refund-paid-out.handler';
 import { MarkRefundPaidOutCommand } from '../../application/refund/commands/mark-refund-paid-out/mark-refund-paid-out.command';
 
-interface RequestRefundBody {
+export class RequestRefundBody {
   bookingId?: string;
   customerId?: string;
 }
 
-interface RejectRefundBody {
+export class RejectRefundBody {
   reason?: string;
 }
 
+@ApiTags('Refunds')
 @Controller('refunds')
 export class RefundController {
   constructor(
